@@ -1,10 +1,11 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import (
     csrf_exempt,
 )  # Cross Site Request Forgery exemption for dev
 from django.shortcuts import get_object_or_404
 import json
-from .models import Doctor, Clinic, ClinicDoctor, District, Category
+from .models import Doctor, Clinic, District, Category
+from django.template import loader
 
 
 @csrf_exempt
@@ -114,3 +115,6 @@ def create_doctor(request):
         except Exception as e:
             return JsonResponse({"success": False, "message": str(e)}, status=500)
     return JsonResponse({"success": False, "message": "Method not allowed"}, status=405)
+def main(request):
+    template = loader.get_template('main.html')
+    return HttpResponse(template.render({}))
