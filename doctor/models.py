@@ -4,8 +4,8 @@ from django.db import models
 class Doctor(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    category = models.ForeignKey('Category',on_delete=models.DO_NOTHING,)
-    language = models.CharField(default='en',max_length=7)
+    category = models.ForeignKey('Category',on_delete=models.DO_NOTHING, null=True, blank=True)
+    language = models.ForeignKey('Language',on_delete=models.DO_NOTHING)
     clinics = models.ManyToManyField('Clinic', through='ClinicDoctor')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

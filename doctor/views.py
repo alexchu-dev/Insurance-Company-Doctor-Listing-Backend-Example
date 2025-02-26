@@ -129,35 +129,35 @@ def doctor_post_get(request, doctor_id=None):
             )
         
         data = json.loads(request.body)
-        # """
-        # Bulk create doctor
-        # https://docs.djangoproject.com/en/5.1/ref/models/querysets/#bulk-create
-        # """
-        # if isinstance(data, list):
-        #     try:
-        #         doctor_list = []
-        #         for doctor in data:
-        #             first_name = doctor.get("first_name")
-        #             last_name = doctor.get("last_name")
-        #             category_name = doctor.get("category")
-        #             language = doctor.get("language")
+        """
+        Bulk create doctor
+        https://docs.djangoproject.com/en/5.1/ref/models/querysets/#bulk-create
+        """
+        if isinstance(data, list):
+            try:
+                doctor_list = []
+                for doctor in data:
+                    first_name = doctor.get("first_name")
+                    last_name = doctor.get("last_name")
+                    category_name = doctor.get("category")
+                    language = doctor.get("language")
 
-        #             field_validator(first_name, "first_name")
-        #             field_validator(last_name, "last_name")
-        #             field_validator(category_name, "category")
+                    field_validator(first_name, "first_name")
+                    field_validator(last_name, "last_name")
+                    field_validator(category_name, "category")
 
-        #             doctor_list.append(
-        #                 Doctor(
-        #                     first_name=first_name,
-        #                     last_name=last_name,
-        #                     category=category_name,
-        #                     language=language,
-        #                 )
-        #             )
-        #         Doctor.objects.bulk_create(doctor_list)
-        #         return JsonResponse({"success": True, "data": doctor_list}, status=201)
-        #     except Exception as e:
-        #         return JsonResponse({"success": False, "message": str(e)}, status=500)
+                    doctor_list.append(
+                        Doctor(
+                            first_name=first_name,
+                            last_name=last_name,
+                            category=category_name,
+                            language=language,
+                        )
+                    )
+                Doctor.objects.bulk_create(doctor_list)
+                return JsonResponse({"success": True, "data": doctor_list}, status=201)
+            except Exception as e:
+                return JsonResponse({"success": False, "message": str(e)}, status=500)
         try:
             first_name = data.get("first_name")
             last_name = data.get("last_name")
@@ -174,7 +174,8 @@ def doctor_post_get(request, doctor_id=None):
                     {"success": False, "message": "Category not found"}, status=404
                 )
 
-            lang = Language.objects.filter(short_code=language).first()
+            lang = Language.objects.filter(short_code=language)
+            print(lang)
             if not lang:
                 return JsonResponse(
                     {"success": False, "message": "Language not found"}, status=404
@@ -213,7 +214,7 @@ def field_validator(data, field: str):
     Returns:
         JsonResponse: False if field is empty
     """
-    if not data.get(field):
+    if not data:
         return JsonResponse(
             {"success": False, "message": f"{field} is required"}, status=400
         )

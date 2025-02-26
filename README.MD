@@ -10,6 +10,12 @@ This project aims to demonstrate the capabilities of buidling sample API using P
 - Django >4.2.19
 - SQLite (built-in)
 
+## Admin panel
+
+If you are using the db.sqlite3 from the repo, the login name is "admin", password is "password".
+Otherwise, you can create a new superuser by:
+> python manage.py createsuperuser
+
 ## 1. Choice of Framework & Library
 
 There are multiple popular choices including Flask, Django, and FastAPI. The reason Django was selected is mainly because it is in the tech spec in the job description, which means the company is using Django. I have used Flask before to provide a UI and endpoints to call my AI model for hate speech detection, it was great with even simpler setup which is excellent for single page system, however it is not suitable for a complex solution and scaling up, and it is comparatively slow. FastAPI is very fast for building API, and it is great for microservices. It is highly scalable and simple, yet it does not support ORM.
