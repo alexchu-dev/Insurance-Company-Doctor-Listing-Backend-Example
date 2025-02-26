@@ -174,7 +174,7 @@ def doctor_post_get(request, doctor_id=None):
                     {"success": False, "message": "Category not found"}, status=404
                 )
 
-            lang = Language.objects.filter(short_code=language)
+            lang = Language.objects.filter(short_code=language).first()
             print(lang)
             if not lang:
                 return JsonResponse(
