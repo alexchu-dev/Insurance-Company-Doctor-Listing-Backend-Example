@@ -146,16 +146,38 @@ def doctor_post_get(request, doctor_id=None):
                     field_validator(last_name, "last_name")
                     field_validator(category_name, "category")
 
+                    category = Category.objects.filter(name=category_name).first()
+                    if not category:
+                        return JsonResponse(
+                            {"success": False, "message": "Category not found"}, status=404
+                        )
+                    
+                    lang = Language.objects.filter(short_code=language).first()
+                    if not lang:
+                        return JsonResponse(
+                            {"success": False, "message": "Language not found"}, status=404
+                        )
+
                     doctor_list.append(
                         Doctor(
                             first_name=first_name,
                             last_name=last_name,
-                            category=category_name,
-                            language=language,
+                            category=category,
+                            language=lang,
                         )
                     )
-                Doctor.objects.bulk_create(doctor_list)
-                return JsonResponse({"success": True, "data": doctor_list}, status=201)
+                created_doctor = Doctor.objects.bulk_create(doctor_list)
+                res = [
+                    {
+                        "id": doctor.id,
+                        "first_name": doctor.first_name,
+                        "last_name": doctor.last_name,
+                        "category": doctor.category.name,
+                        "language": doctor.language.short_code,
+                    }
+                    for doctor in created_doctor
+                ]
+                return JsonResponse({"success": True, "data": res}, status=201)
             except Exception as e:
                 return JsonResponse({"success": False, "message": str(e)}, status=500)
         try:
@@ -175,7 +197,6 @@ def doctor_post_get(request, doctor_id=None):
                 )
 
             lang = Language.objects.filter(short_code=language).first()
-            print(lang)
             if not lang:
                 return JsonResponse(
                     {"success": False, "message": "Language not found"}, status=404
