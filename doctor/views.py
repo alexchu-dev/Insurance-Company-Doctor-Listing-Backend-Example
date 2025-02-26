@@ -112,7 +112,7 @@ def doctor_post_get(request, doctor_id=None):
             except Exception as e:
                 return JsonResponse({"success": False, "message": str(e)}, status=404)
 
-    if request.method == "POST":
+    elif request.method == "POST":
         """CREATE doctors/doctor
         Body:
             first_name (str): first name
@@ -123,34 +123,41 @@ def doctor_post_get(request, doctor_id=None):
         Returns:
             JSON: Doctor dto in JsonResponse
         """
+        if not request.body:
+            return JsonResponse(
+                {"success": False, "message": "Request body is empty"}, status=400
+            )
+        
         data = json.loads(request.body)
-        """
-        Bulk create doctor
-        https://docs.djangoproject.com/en/5.1/ref/models/querysets/#bulk-create
-        """
-        if isinstance(data, list):
-            doctor_list = []
-            for doctor in data:
-                first_name = data.get("first_name")
-                last_name = data.get("last_name")
-                category_name = data.get("category")
-                language = data.get("language")
+        # """
+        # Bulk create doctor
+        # https://docs.djangoproject.com/en/5.1/ref/models/querysets/#bulk-create
+        # """
+        # if isinstance(data, list):
+        #     try:
+        #         doctor_list = []
+        #         for doctor in data:
+        #             first_name = doctor.get("first_name")
+        #             last_name = doctor.get("last_name")
+        #             category_name = doctor.get("category")
+        #             language = doctor.get("language")
 
-                field_validator(first_name, "first_name")
-                field_validator(last_name, "last_name")
-                field_validator(category_name, "category")
+        #             field_validator(first_name, "first_name")
+        #             field_validator(last_name, "last_name")
+        #             field_validator(category_name, "category")
 
-                doctor_list.append(
-                    Doctor(
-                        first_name=first_name,
-                        last_name=last_name,
-                        category=category_name,
-                        language=language,
-                    )
-                )
-            Doctor.objects.bulk_create(doctor_list)
-            return JsonResponse({"success": True, "data": doctor_list}, status=201)
-
+        #             doctor_list.append(
+        #                 Doctor(
+        #                     first_name=first_name,
+        #                     last_name=last_name,
+        #                     category=category_name,
+        #                     language=language,
+        #                 )
+        #             )
+        #         Doctor.objects.bulk_create(doctor_list)
+        #         return JsonResponse({"success": True, "data": doctor_list}, status=201)
+        #     except Exception as e:
+        #         return JsonResponse({"success": False, "message": str(e)}, status=500)
         try:
             first_name = data.get("first_name")
             last_name = data.get("last_name")
