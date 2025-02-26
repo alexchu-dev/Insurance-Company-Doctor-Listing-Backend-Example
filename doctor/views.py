@@ -137,35 +137,38 @@ def doctor_post_get(request, doctor_id=None):
             try:
                 doctor_list = []
                 for doctor in data:
-                    first_name = doctor.get("first_name")
-                    last_name = doctor.get("last_name")
-                    category_name = doctor.get("category")
-                    language = doctor.get("language")
+                    try:
+                        first_name = doctor.get("first_name")
+                        last_name = doctor.get("last_name")
+                        category_name = doctor.get("category")
+                        language = doctor.get("language")
 
-                    field_validator(first_name, "first_name")
-                    field_validator(last_name, "last_name")
-                    field_validator(category_name, "category")
+                        field_validator(first_name, "first_name")
+                        field_validator(last_name, "last_name")
+                        field_validator(category_name, "category")
 
-                    category = Category.objects.filter(name=category_name).first()
-                    if not category:
-                        return JsonResponse(
-                            {"success": False, "message": "Category not found"}, status=404
-                        )
-                    
-                    lang = Language.objects.filter(short_code=language).first()
-                    if not lang:
-                        return JsonResponse(
-                            {"success": False, "message": "Language not found"}, status=404
-                        )
+                        category = Category.objects.filter(name=category_name).first()
+                        if not category:
+                            return JsonResponse(
+                                {"success": False, "message": "Category not found"}, status=404
+                            )
+                        
+                        lang = Language.objects.filter(short_code=language).first()
+                        if not lang:
+                            return JsonResponse(
+                                {"success": False, "message": "Language not found"}, status=404
+                            )
 
-                    doctor_list.append(
-                        Doctor(
-                            first_name=first_name,
-                            last_name=last_name,
-                            category=category,
-                            language=lang,
+                        doctor_list.append(
+                            Doctor(
+                                first_name=first_name,
+                                last_name=last_name,
+                                category=category,
+                                language=lang,
+                            )
                         )
-                    )
+                    except ValueError as ve:
+                        return JsonResponse({"success": False, "message": str(ve)}, status=400)
                 created_doctor = Doctor.objects.bulk_create(doctor_list)
                 res = [
                     {
@@ -221,6 +224,8 @@ def doctor_post_get(request, doctor_id=None):
                 },
                 status=201,
             )
+        except ValueError as ve:
+                        return JsonResponse({"success": False, "message": str(ve)}, status=400)
         except Exception as e:
             return JsonResponse({"success": False, "message": str(e)}, status=500)
     return JsonResponse({"success": False, "message": "Method not allowed"}, status=405)
@@ -236,10 +241,7 @@ def field_validator(data, field: str):
         JsonResponse: False if field is empty
     """
     if not data:
-        return JsonResponse(
-            {"success": False, "message": f"{field} is required"}, status=400
-        )
-    return None
+        raise ValueError(f"{field} is required")
 
 def main(request):
     template = loader.get_template("main.html")
