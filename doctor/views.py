@@ -4,16 +4,32 @@ from django.views.decorators.csrf import (
 )  # Cross Site Request Forgery exemption for dev
 from django.shortcuts import get_object_or_404
 import json
-from .models import Doctor, Clinic, District, Category
+from .models import Doctor, Clinic, District, Category, Language
 from django.template import loader
 
 
 @csrf_exempt
 def doctor_post_get(request, doctor_id=None):
-    # GET request
+    """
+    Single endpoint for CRUD operations on doctors/doctor
+    """
     if request.method == "GET":
-        # List single doctor with all clinics registered
+        """READ doctors/doctor by filters and doctor by id
+
+        Param:
+            doctor_id (int): default None for all doctors.
+        Query:
+            district (str): district name
+            category (str): category name
+            min_price (int): minimum price
+            max_price (int): maximum price
+            language (str): language short code
+
+        Returns:
+            JSON: Doctor dto in JsonResponse
+        """
         if doctor_id:
+            # List single doctor with all clinics registered
             try:
                 doctor = get_object_or_404(Doctor, id=doctor_id)
                 category = Category.objects.filter(id=doctor.category.id).first()
@@ -47,8 +63,9 @@ def doctor_post_get(request, doctor_id=None):
                 )
             except Exception as e:
                 return JsonResponse({"success": False, "message": str(e)}, status=404)
-        # List all doctors or by filter if no doctor_id is provided
+        
         else:
+            # List all doctors or by filter if no doctor_id is provided
             try:
                 doctors = Doctor.objects.all()
                 district = request.GET.get("district")
@@ -67,6 +84,14 @@ def doctor_post_get(request, doctor_id=None):
                     doctors = doctors.filter(language=language)
                 # Price range in query
                 if min_price and max_price:
+                    if min_price > max_price:
+                        return JsonResponse(
+                            {
+                                "success": False,
+                                "message": "min_price should be less than max_price",
+                            },
+                            status=400,
+                        )
                     doctors = doctors.filter(
                         clinicdoctor__clinic__consultation_fee__gte=min_price,
                         clinicdoctor__clinic__consultation_fee__lte=max_price,
@@ -86,22 +111,55 @@ def doctor_post_get(request, doctor_id=None):
                 return JsonResponse({"success": True, "data": doctor_list}, safe=False)
             except Exception as e:
                 return JsonResponse({"success": False, "message": str(e)}, status=404)
-    # POST request
+
     if request.method == "POST":
+        """CREATE doctors/doctor
+        Body:
+            first_name (str): first name
+            last_name (str): last name
+            category (str): category name
+            language (str): language short code
+
+        Returns:
+            JSON: Doctor dto in JsonResponse
+        """
+        data = json.loads(request.body)
+        """
+        Bulk create doctor
+        https://docs.djangoproject.com/en/5.1/ref/models/querysets/#bulk-create
+        """
+        if isinstance(data, list):
+            doctor_list = []
+            for doctor in data:
+                first_name = data.get("first_name")
+                last_name = data.get("last_name")
+                category_name = data.get("category")
+                language = data.get("language")
+
+                field_validator(first_name, "first_name")
+                field_validator(last_name, "last_name")
+                field_validator(category_name, "category")
+
+                doctor_list.append(
+                    Doctor(
+                        first_name=first_name,
+                        last_name=last_name,
+                        category=category_name,
+                        language=language,
+                    )
+                )
+            Doctor.objects.bulk_create(doctor_list)
+            return JsonResponse({"success": True, "data": doctor_list}, status=201)
+
         try:
-            data = json.loads(request.body)
             first_name = data.get("first_name")
             last_name = data.get("last_name")
             category_name = data.get("category")
+            language = data.get("language")
 
-            if not first_name or not last_name:
-                return JsonResponse(
-                    {
-                        "success": False,
-                        "message": "First name and last name are required",
-                    },
-                    status=400,
-                )
+            field_validator(first_name, "first_name")
+            field_validator(last_name, "last_name")
+            field_validator(category_name, "category")
 
             category = Category.objects.filter(name=category_name).first()
             if not category:
@@ -109,10 +167,17 @@ def doctor_post_get(request, doctor_id=None):
                     {"success": False, "message": "Category not found"}, status=404
                 )
 
+            lang = Language.objects.filter(short_code=language).first()
+            if not lang:
+                return JsonResponse(
+                    {"success": False, "message": "Language not found"}, status=404
+                )
+
             doctor = Doctor.objects.create(
                 first_name=data["first_name"],
                 last_name=data["last_name"],
                 category=category,
+                language=lang,
             )
             return JsonResponse(
                 {
@@ -122,58 +187,30 @@ def doctor_post_get(request, doctor_id=None):
                         "first_name": doctor.first_name,
                         "last_name": doctor.last_name,
                         "category": doctor.category.name,
+                        "language": doctor.language.short_code,
                     },
-                }
+                },
+                status=201,
             )
         except Exception as e:
             return JsonResponse({"success": False, "message": str(e)}, status=500)
+    return JsonResponse({"success": False, "message": "Method not allowed"}, status=405)
 
+def field_validator(data, field: str):
+    """Field validations
 
-# # Create a Doctor
-# @csrf_exempt
-# def create_doctor(request):
-#     if request.method == "POST":
-#         try:
-#             data = json.loads(request.body)
-#             first_name = data.get("first_name")
-#             last_name = data.get("last_name")
-#             category_name = data.get("category")
+    Args:
+        data (_type_): _description_
+        field (string): _description_
 
-#             if not first_name or not last_name:
-#                 return JsonResponse(
-#                     {
-#                         "success": False,
-#                         "message": "First name and last name are required",
-#                     },
-#                     status=400,
-#                 )
-
-#             category = Category.objects.filter(name=category_name).first()
-#             if not category:
-#                 return JsonResponse(
-#                     {"success": False, "message": "Category not found"}, status=404
-#                 )
-
-#             doctor = Doctor.objects.create(
-#                 first_name=data["first_name"],
-#                 last_name=data["last_name"],
-#                 category=category,
-#             )
-#             return JsonResponse(
-#                 {
-#                     "success": True,
-#                     "data": {
-#                         "id": doctor.id,
-#                         "first_name": doctor.first_name,
-#                         "last_name": doctor.last_name,
-#                         "category": doctor.category.name,
-#                     },
-#                 }
-#             )
-#         except Exception as e:
-#             return JsonResponse({"success": False, "message": str(e)}, status=500)
-#     return JsonResponse({"success": False, "message": "Method not allowed"}, status=405)
-
+    Returns:
+        JsonResponse: False if field is empty
+    """
+    if not data.get(field):
+        return JsonResponse(
+            {"success": False, "message": f"{field} is required"}, status=400
+        )
+    return None
 
 def main(request):
     template = loader.get_template("main.html")

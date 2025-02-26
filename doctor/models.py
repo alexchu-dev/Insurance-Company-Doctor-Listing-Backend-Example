@@ -56,6 +56,14 @@ class District(models.Model):
     def __str__(self):
         return self.name
 
+""" Language Model"""
+class Language(models.Model):
+    short_code = models.CharField(max_length=7)
+    full_name = models.CharField(max_length=31)
+
+    def __str__(self):
+        return self.full_name
+    
 """ Translation Model """
 class Translation(models.Model):
     lang = models.CharField(max_length=7)
