@@ -66,7 +66,7 @@ as Gitflow should be applied.
 
 ## 4. Assumptions
 
-a. I have assumed that Doctors can work in multiple clinic, and clinic can have multiple doctors which is a many to many relationship, therefore a bridging table was used. I have assumed suitable size for the variables to use the right amount of bytes. I also assumed there referencing relationship and created different models. I assumed while the foreign key related table should not be deleted as CASCADE. Created_at and Updated_at should be exist for specific models. JSON was assumed to be the API output.
+a. I have assumed that Doctors can work in multiple clinic, and clinic can have multiple doctors which is a many to many relationship, therefore a bridging table was used. I have assumed suitable size for the variables to use the right amount of bytes. I also assumed there referencing relationship and created different models. I assumed while the foreign key related table should not be deleted as CASCADE. Created_at and Updated_at should be exist for specific models. JSON was assumed to be the API output. Doctors are assumed to speak only one primary language.
 
 b. Single endpoint processing both GET and POST was assumed, for best practice. JSON return "success" message, and "data" includes the respective data.
 
@@ -76,6 +76,7 @@ b. Single endpoint processing both GET and POST was assumed, for best practice. 
     erDiagram
     Doctor ||--|{ Clinic_Doctor : "registered in"
     Doctor }|--|| Category : "specialised"
+    Doctor }|--|| Language: "speaks"
     Doctor {
         int doctor_id PK
         string first_name
