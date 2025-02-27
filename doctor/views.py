@@ -4,7 +4,7 @@ from django.views.decorators.csrf import (
 )  # Cross Site Request Forgery exemption for dev
 from django.shortcuts import get_object_or_404
 import json
-from .models import Doctor, Clinic, District, Category, Language
+from .models import Doctor, Clinic, District, Category, Language, ClinicDoctor
 from django.template import loader
 
 
@@ -278,7 +278,34 @@ def create_clinic(request):
         except Exception as e:
             return JsonResponse({"success": False, "message": str(e)}, status=500)        
 
+@csrf_exempt
+def assign_doctor(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            doctor_id = field_validator(data.get("doctor_id"), "doctor")
+            clinic_id = field_validator(data.get("clinic_id"), "clinic")
 
+            doctor = Doctor.objects.filter(id=doctor_id).first()
+            if not doctor:
+                return JsonResponse(
+                    {"success": False, "message": "Doctor not found"}, status=404
+                )
+            
+            clinic = Clinic.objects.filter(id=clinic_id).first()
+            if not clinic:
+                return JsonResponse(
+                    {"success": False, "message": "Clinic not found"}, status=404
+                )
+            
+            if ClinicDoctor.objects.filter(doctor=doctor, clinic=clinic).exists():
+                return JsonResponse({"success": False, "message": "Doctor is already assigned to this clinic"}, status=400)
+            
+            ClinicDoctor.objects.create(doctor=doctor, clinic=clinic)
+            return JsonResponse({"success": True, "message":"Assigned doctor to clinic."}, status=201)
+        
+        except Exception as e:
+            return JsonResponse({"success": False, "message": str(e)}, status=500)
 
 def field_validator(data, field: str):
     """Field validations
