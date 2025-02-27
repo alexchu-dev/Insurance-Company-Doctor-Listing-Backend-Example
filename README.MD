@@ -12,7 +12,7 @@ Mac/Linux
 python3 manage.py runserver
 ```
 
-windows
+Windows
 
 ```bash
 py -3 -m manage.py runserver
@@ -29,8 +29,17 @@ py -3 -m manage.py runserver
 If you are using the db.sqlite3 from the repo, the login name is "admin", password is "password".
 Otherwise, you can create a new superuser by:
 
-> python3 manage.py createsuperuser (mac/linux)
-> py -3 -m manage.py createsuperuser (windows)
+Mac/Linux
+
+```bash
+python3 manage.py createsuperuser
+```
+
+Windows
+
+```bash
+py -3 -m manage.py createsuperuser
+```
 
 ## 1. Choice of Framework & Library
 
