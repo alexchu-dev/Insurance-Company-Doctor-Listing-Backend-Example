@@ -138,14 +138,10 @@ def doctor_post_get(request, doctor_id=None):
                 doctor_list = []
                 for doctor in data:
                     try:
-                        first_name = doctor.get("first_name")
-                        last_name = doctor.get("last_name")
-                        category_name = doctor.get("category")
-                        language = doctor.get("language")
-
-                        field_validator(first_name, "first_name")
-                        field_validator(last_name, "last_name")
-                        field_validator(category_name, "category")
+                        first_name = field_validator(data.get("first_name"), "first_name")
+                        last_name = field_validator(data.get("last_name"), "last_name")
+                        category_name = field_validator(data.get("category"), "category")
+                        language = field_validator(data.get("language"), "language")
 
                         category = Category.objects.filter(name=category_name).first()
                         if not category:
@@ -184,14 +180,10 @@ def doctor_post_get(request, doctor_id=None):
             except Exception as e:
                 return JsonResponse({"success": False, "message": str(e)}, status=500)
         try:
-            first_name = data.get("first_name")
-            last_name = data.get("last_name")
-            category_name = data.get("category")
-            language = data.get("language")
-
-            field_validator(first_name, "first_name")
-            field_validator(last_name, "last_name")
-            field_validator(category_name, "category")
+            first_name = field_validator(data.get("first_name"), "first_name")
+            last_name = field_validator(data.get("last_name"), "last_name")
+            category_name = field_validator(data.get("category"), "category")
+            language = field_validator(data.get("language"), "language")
 
             category = Category.objects.filter(name=category_name).first()
             if not category:
@@ -230,6 +222,25 @@ def doctor_post_get(request, doctor_id=None):
             return JsonResponse({"success": False, "message": str(e)}, status=500)
     return JsonResponse({"success": False, "message": "Method not allowed"}, status=405)
 
+# def create_clinic(request):
+#     if not request.body:
+#         return JsonResponse(
+#             {"success": False, "message": "Request body is empty"}, status=400
+#         )
+#     data = json.loads(request.body)
+#     try:
+#         name = data.get("name")
+#         district = data.get("district")
+#         address = data.get("address")
+#         phone_no1 = data.get("phone_no1")
+#         phone_no2 = data.get("phone_no2")
+#         consultation_fee = data.get("consultation_fee")
+#         prescription = data.get("prescription")
+#         working_hours = data.get("working_hours")
+
+    # except Exception as e:
+    #     return JsonResponse({"success": False, "message": str(e)}, status=500)        
+
 def field_validator(data, field: str):
     """Field validations
 
@@ -242,6 +253,7 @@ def field_validator(data, field: str):
     """
     if not data:
         raise ValueError(f"{field} is required")
+    return data
 
 def main(request):
     template = loader.get_template("main.html")
