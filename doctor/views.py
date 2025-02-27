@@ -224,58 +224,59 @@ def doctor_post_get(request, doctor_id=None):
 
 @csrf_exempt
 def create_clinic(request):
-    if not request.body:
-        return JsonResponse(
-            {"success": False, "message": "Request body is empty"}, status=400
-        )
-    data = json.loads(request.body)
-    try:
-        name = field_validator(data.get("name"), "name")
-        district_name = field_validator(data.get("district"), "district")
-        address = field_validator(data.get("address"), "address")
-        phone_no1 = field_validator(data.get("phone_no1"), "phone_no1")
-        phone_no2 = data.get("phone_no2")
-        consultation_fee = field_validator(data.get("consultation_fee"), "consultation_fee")
-        prescription = field_validator(data.get("prescription"), "prescription")
-        working_hours = field_validator(data.get("working_hours"), "working_hours")
-
-        district = District.objects.filter(name=district_name).first()
-        if not district:
+    if request.method = "POST":
+        if not request.body:
             return JsonResponse(
-                {"success": False, "message": "District not found"}, status=404
+                {"success": False, "message": "Request body is empty"}, status=400
             )
-        
-        clinic = Clinic.objects.create(
-            name=name,
-            district=district,
-            address=address,
-            phone_no1=phone_no1,
-            phone_no2=phone_no2,
-            consultation_fee=consultation_fee,
-            prescription=prescription,
-            working_hours=working_hours,
-        )
-        return JsonResponse(
-            {
-                "success": True,
-                "data": {
-                    "id": clinic.id,
-                    "name": clinic.name,
-                    "district": clinic.district.name,
-                    "address": clinic.address,
-                    "phone_no1": clinic.phone_no1,
-                    "phone_no2": clinic.phone_no2,
-                    "consultation_fee": clinic.consultation_fee,
-                    "prescription": clinic.prescription,
-                    "working_hours": clinic.working_hours,
+        data = json.loads(request.body)
+        try:
+            name = field_validator(data.get("name"), "name")
+            district_name = field_validator(data.get("district"), "district")
+            address = field_validator(data.get("address"), "address")
+            phone_no1 = field_validator(data.get("phone_no1"), "phone_no1")
+            phone_no2 = data.get("phone_no2")
+            consultation_fee = field_validator(data.get("consultation_fee"), "consultation_fee")
+            prescription = field_validator(data.get("prescription"), "prescription")
+            working_hours = field_validator(data.get("working_hours"), "working_hours")
+
+            district = District.objects.filter(name=district_name).first()
+            if not district:
+                return JsonResponse(
+                    {"success": False, "message": "District not found"}, status=404
+                )
+            
+            clinic = Clinic.objects.create(
+                name=name,
+                district=district,
+                address=address,
+                phone_no1=phone_no1,
+                phone_no2=phone_no2,
+                consultation_fee=consultation_fee,
+                prescription=prescription,
+                working_hours=working_hours,
+            )
+            return JsonResponse(
+                {
+                    "success": True,
+                    "data": {
+                        "id": clinic.id,
+                        "name": clinic.name,
+                        "district": clinic.district.name,
+                        "address": clinic.address,
+                        "phone_no1": clinic.phone_no1,
+                        "phone_no2": clinic.phone_no2,
+                        "consultation_fee": clinic.consultation_fee,
+                        "prescription": clinic.prescription,
+                        "working_hours": clinic.working_hours,
+                    },
                 },
-            },
-            status=201,
-        )
-    except ValueError as ve:
-        return JsonResponse({"success": False, "message": str(ve)}, status=400)
-    except Exception as e:
-        return JsonResponse({"success": False, "message": str(e)}, status=500)        
+                status=201,
+            )
+        except ValueError as ve:
+            return JsonResponse({"success": False, "message": str(ve)}, status=400)
+        except Exception as e:
+            return JsonResponse({"success": False, "message": str(e)}, status=500)        
 
 def field_validator(data, field: str):
     """Field validations
