@@ -5,9 +5,18 @@
 This project aims to demonstrate the capabilities of buidling sample API using Python.
 
 start by:
-> python3 manage.py runserver (mac/linux)
-> py -3 -m manage.py runserver (windows)
 
+Mac/Linux
+
+```bash
+python3 manage.py runserver
+```
+
+windows
+
+```bash
+py -3 -m manage.py runserver
+```
 
 ## Stack Specficaitions
 
@@ -19,6 +28,7 @@ start by:
 
 If you are using the db.sqlite3 from the repo, the login name is "admin", password is "password".
 Otherwise, you can create a new superuser by:
+
 > python3 manage.py createsuperuser (mac/linux)
 > py -3 -m manage.py createsuperuser (windows)
 
@@ -62,6 +72,7 @@ b. Single endpoint processing both GET and POST was assumed, for best practice. 
         string first_name
         string last_name
         int category_id FK
+        string language FK
     }
     Clinic }|--|| District : "located in"
     Clinic ||--|{ Clinic_Doctor : "has"
@@ -82,17 +93,22 @@ b. Single endpoint processing both GET and POST was assumed, for best practice. 
         int clinic_id FK
     }
     District {
-        int district_id FK
+        int district_id PK
         string name
-        }
-        Category {
-            int category_id FK
-            string name
-        }
-        Translation {
-            int translation_id FK
-            string lang
-            string key
-            string value
-        }
+    }
+    Category {
+        int category_id PK
+        string name
+    }
+    Language {
+        int language_id PK
+        string short_code
+        string full_name
+    }
+    Translation {
+        int translation_id PK
+        string lang
+        string key
+        string value
+    }
 ```
