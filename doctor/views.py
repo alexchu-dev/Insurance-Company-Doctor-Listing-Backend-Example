@@ -224,7 +224,7 @@ def doctor_post_get(request, doctor_id=None):
 
 @csrf_exempt
 def create_clinic(request):
-    if request.method = "POST":
+    if request.method == "POST":
         if not request.body:
             return JsonResponse(
                 {"success": False, "message": "Request body is empty"}, status=400
@@ -277,6 +277,8 @@ def create_clinic(request):
             return JsonResponse({"success": False, "message": str(ve)}, status=400)
         except Exception as e:
             return JsonResponse({"success": False, "message": str(e)}, status=500)        
+
+
 
 def field_validator(data, field: str):
     """Field validations
