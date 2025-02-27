@@ -4,6 +4,11 @@
 
 This project aims to demonstrate the capabilities of buidling sample API using Python.
 
+start by:
+> python3 manage.py runserver (mac/linux)
+> py -3 -m manage.py runserver (windows)
+
+
 ## Stack Specficaitions
 
 - Python >3.9.13
@@ -14,7 +19,8 @@ This project aims to demonstrate the capabilities of buidling sample API using P
 
 If you are using the db.sqlite3 from the repo, the login name is "admin", password is "password".
 Otherwise, you can create a new superuser by:
-> python manage.py createsuperuser
+> python3 manage.py createsuperuser (mac/linux)
+> py -3 -m manage.py createsuperuser (windows)
 
 ## 1. Choice of Framework & Library
 
