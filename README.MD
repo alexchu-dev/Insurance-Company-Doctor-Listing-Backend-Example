@@ -1,8 +1,8 @@
-# NECKTIE Backend Assessment
+# Insurance Company Doctor Listing Backend Example
 
 ## Abstract
 
-This project aims to demonstrate the capabilities of buidling sample API using Python.
+This repo demonstrates a backend design of a doctor listing function for an insurance platform by using Python Django.
 
 start by:
 
@@ -41,6 +41,8 @@ Windows
 py -3 -m manage.py createsuperuser
 ```
 
+## Considerations
+
 ## 1. Choice of Framework & Library
 
 There are multiple popular choices including Flask, Django, and FastAPI. The reason Django was selected is mainly because it is in the tech spec in the job description, which means the company is using Django. I have used Flask before to provide a UI and endpoints to call my AI model for hate speech detection, it was great with even simpler setup which is excellent for single page system, however it is not suitable for a complex solution and scaling up, and it is comparatively slow. FastAPI is very fast for building API, and it is great for microservices. It is highly scalable and simple, yet it does not support ORM.
@@ -52,6 +54,9 @@ b. A few assumptions were made:
 - Assuming this were to build a whole system in real situation, therefore Django was picked. Otherwise, Flask and FastAPI is good enough and faster on development for a small demonstration purpose.
 
 - It is a large scale platform which needs reliability and security is a concern.
+
+- The opening hours of the clinics/ doctor is assumed to be in JSON format. This is to make the work simpler, it could also be creating another schema to store the clinic opening hours.
+
 
 ## 2. Potential Improvement
 
